@@ -1,0 +1,114 @@
+dsub --provider google-cls-v2 --project refined-lotus-456900-t8 --zones "us-east1-*" --logging gs://gene222_hw2_phegde8/logging/p7 --input-recursive FASTQ_INPUT=gs://gene222_datasets_references/Sample_FASTQ/p7 --input-recursive REFERENCE=gs://gene222_datasets_references/REFERENCE_GRCH37 --output OUTPUT_FILE=gs://gene222_hw2_phegde8/OUTPUT_BWA/p7/* --machine-type n1-standard-4 --image pegi3s/bwa --command 'bwa mem -t 8 -M -R "@RG\\tID:0\\tLB:Library\\tPL:Illumina\\tSM:ERR194159" "${REFERENCE}"/GRCh37-lite.fa "${FASTQ_INPUT}"/ERR194159_1_seqtk_70000.fastq "${FASTQ_INPUT}"/ERR194159_2_seqtk_70000.fastq > "$(dirname ${OUTPUT_FILE})"/bwa-sam.sam'
+
+dsub --provider google-cls-v2 --project refined-lotus-456900-t8 --zones "us-east1-*" --logging gs://gene222_hw2_phegde8/logging/p7_2 --input SAM_INPUT=gs://gene222_hw2_phegde8/OUTPUT_BWA/bwa-sam.sam --output OUTPUT_FILE=gs://gene222_hw2_phegde8/OUTPUT_BWA/* --machine-type n1-standard-2 --image broadinstitute/gatk --boot-disk-size 20 --command 'samtools view -bS "${SAM_INPUT}" > "$(dirname ${OUTPUT_FILE})"/output_bwa.bam'
+
+
+
+
+
+dsub --provider google-cls-v2 --project refined-lotus-456900-t8 --zones "us-east1-*" --logging gs://gene222_hw2_phegde8/logging --input BAM_INPUT=gs://gene222_hw2_phegde8/OUTPUT_BWA/output_bwa.bam --output OUTPUT_FILE=gs://gene222_hw2_phegde8/OUTPUT_BWA/* --machine-type n1-standard-2 --image broadinstitute/gatk --boot-disk-size 20 --command 'gatk SortSam INPUT="${BAM_INPUT}" OUTPUT="$(dirname ${OUTPUT_FILE})"/output_picard_sorted.bam SORT_ORDER="queryname" CREATE_MD5_FILE=true CREATE_INDEX=true TMP_DIR=`pwd`/tmp'
+
+
+
+dsub --provider google-cls-v2 --project refined-lotus-456900-t8 --zones "us-east1-*" --logging gs://gene222_hw2_phegde8/logging --input BAM_INPUT=gs://gene222_hw2_phegde8/OUTPUT_BWA/output_picard_sorted.bam --output OUTPUT_FILE=gs://gene222_hw2_phegde8/OUTPUT_BWA/* --machine-type n1-standard-2 --image broadinstitute/gatk --boot-disk-size 20 --command 'gatk MarkDuplicates -I "${BAM_INPUT}" -M "$(dirname ${OUTPUT_FILE})"/metrics_md -O "$(dirname ${OUTPUT_FILE})"/output_dedup_bam.bam --VALIDATION_STRINGENCY SILENT --OPTICAL_DUPLICATE_PIXEL_DISTANCE 2500 --TMP_DIR `pwd`/tmp'
+
+
+
+
+
+
+dsub --provider google-cls-v2 --project refined-lotus-456900-t8 --zones "us-east1-*" --logging gs://gene222_hw2_phegde8/logging --input BAM_INPUT=gs://gene222_hw2_phegde8/OUTPUT_BWA/output_dedup_bam.bam --output OUTPUT_FILE=gs://gene222_hw2_phegde8/OUTPUT_BWA/* --machine-type n1-standard-2 --image broadinstitute/gatk --boot-disk-size 20 --command 'gatk SortSam -INPUT "${BAM_INPUT}" -OUTPUT "$(dirname ${OUTPUT_FILE})"/output_dedup_sorted.bam -SORT_ORDER coordinate -CREATE_MD5_FILE true -TMP_DIR `pwd`/tmp -CREATE_INDEX true'
+
+
+#!/bin/bash
+# Define variables
+eid=1  #Experiment ID - running 2 patients – this helps organize the log files  
+projectID="refined-lotus-456900-t8"
+bucketID="gene222_hw2_phegde8"
+# Define the number of patients (P)
+P=1  # Change this to the desired number of patients
+# Loop through patient IDs from 1 to P
+for pid in $(seq 1 $P); do
+   dsub --provider google-cls-v2 --project refined-lotus-456900-t8 --zones "us-east1-*" --logging gs://gene222_hw2_phegde8/logging/F${eid}/stage1/ --input-recursive FASTQ_INPUT=gs://gene222_datasets_references/Sample_FASTQ/p${pid} --input-recursive REFERENCE=gs://gene222_datasets_references/REFERENCE_GRCH37 --output OUTPUT_FILE=gs://gene222_hw2_phegde8/OUTPUT_BWA/p7/* --machine-type n1-standard-4 --image pegi3s/bwa --command 'bwa mem -t 8 -M -R "@RG\\tID:0\\tLB:Library\\tPL:Illumina\\tSM:ERR194159" "${REFERENCE}"/GRCh37-lite.fa "${FASTQ_INPUT}"/ERR194159_1_seqtk_70000.fastq "${FASTQ_INPUT}"/ERR194159_2_seqtk_70000.fastq > "$(dirname ${OUTPUT_FILE})"/bwa-sam.sam'
+done
+
+#!/bin/bash
+# Define variables
+eid=1  #Experiment ID - running 2 patients – this helps organize the log files  
+projectID="refined-lotus-456900-t8"
+bucketID="gene222_hw2_phegde8"
+# Define the number of patients (P)
+P=1  # Change this to the desired number of patients
+# Loop through patient IDs from 1 to P
+for pid in $(seq 1 $P); do
+   dsub --provider google-cls-v2 --project refined-lotus-456900-t8 --zones "us-east1-*" --logging gs://gene222_hw2_phegde8/logging/F${eid}/stage2/ --input SAM_INPUT=gs://gene222_hw2_phegde8/OUTPUT_BWA/bwa-sam.sam --output OUTPUT_FILE=gs://gene222_hw2_phegde8/OUTPUT_BWA/* --machine-type n1-standard-2 --image broadinstitute/gatk --boot-disk-size 20 --command 'samtools view -bS "${SAM_INPUT}" > "$(dirname ${OUTPUT_FILE})"/output_bwa.bam'
+
+
+#!/bin/bash
+# Define variables
+eid=1  #Experiment ID - running 2 patients – this helps organize the log files  
+projectID="refined-lotus-456900-t8"
+bucketID="gene222_hw2_phegde8"
+# Define the number of patients (P)
+P=1  # Change this to the desired number of patients
+# Loop through patient IDs from 1 to P
+for pid in $(seq 1 $P); do
+    dsub --provider google-cls-v2 --project refined-lotus-456900-t8 --zones "us-east1-*" --logging gs://gene222_hw2_phegde8/logging/F${eid}/stage3/ --input BAM_INPUT=gs://gene222_hw2_phegde8/OUTPUT_BWA/output_bwa.bam --output OUTPUT_FILE=gs://gene222_hw2_phegde8/OUTPUT_BWA/* --machine-type n1-standard-2 --image broadinstitute/gatk --boot-disk-size 20 --command 'gatk SortSam INPUT="${BAM_INPUT}" OUTPUT="$(dirname ${OUTPUT_FILE})"/output_picard_sorted.bam SORT_ORDER="queryname" CREATE_MD5_FILE=true CREATE_INDEX=true TMP_DIR=`pwd`/tmp'
+done
+
+#!/bin/bash
+# Define variables
+eid=1  #Experiment ID - running 2 patients – this helps organize the log files  
+projectID="refined-lotus-456900-t8"
+bucketID="gene222_hw2_phegde8"
+# Define the number of patients (P)
+P=1  # Change this to the desired number of patients
+# Loop through patient IDs from 1 to P
+for pid in $(seq 1 $P); do
+    dsub --provider google-cls-v2 --project refined-lotus-456900-t8 --zones "us-east1-*" --logging gs://gene222_hw2_phegde8/logging/F${eid}/stage4/ --input BAM_INPUT=gs://gene222_hw2_phegde8/OUTPUT_BWA/output_picard_sorted.bam --output OUTPUT_FILE=gs://gene222_hw2_phegde8/OUTPUT_BWA/* --machine-type n1-standard-2 --image broadinstitute/gatk --boot-disk-size 20 --command 'gatk MarkDuplicates -I "${BAM_INPUT}" -M "$(dirname ${OUTPUT_FILE})"/metrics_md -O "$(dirname ${OUTPUT_FILE})"/output_dedup_bam.bam --VALIDATION_STRINGENCY SILENT --OPTICAL_DUPLICATE_PIXEL_DISTANCE 2500 --TMP_DIR `pwd`/tmp'
+
+#!/bin/bash
+# Define variables
+eid=1  #Experiment ID - running 2 patients – this helps organize the log files  
+projectID="refined-lotus-456900-t8"
+bucketID="gene222_hw2_phegde8"
+# Define the number of patients (P)
+P=1  # Change this to the desired number of patients
+# Loop through patient IDs from 1 to P
+for pid in $(seq 1 $P); do
+    dsub --provider google-cls-v2 --project refined-lotus-456900-t8 --zones "us-east1-*" --logging gs://gene222_hw2_phegde8/logging/F${eid}/stage5/  --input BAM_INPUT=gs://gene222_hw2_phegde8/OUTPUT_BWA/output_dedup_bam.bam --output OUTPUT_FILE=gs://gene222_hw2_phegde8/OUTPUT_BWA/* --machine-type n1-standard-2 --image broadinstitute/gatk --boot-disk-size 20 --command 'gatk SortSam -INPUT "${BAM_INPUT}" -OUTPUT "$(dirname ${OUTPUT_FILE})"/output_dedup_sorted.bam -SORT_ORDER coordinate -CREATE_MD5_FILE true -TMP_DIR `pwd`/tmp -CREATE_INDEX true'
+
+
+#!/bin/bash
+# Define variables
+eid=1  #Experiment ID - running 2 patients – this helps organize the log files  
+projectID="refined-lotus-456900-t8"
+bucketID="gene222_hw2_phegde8"
+# Define the number of patients (P)
+P=1  # Change this to the desired number of patients
+# Loop through patient IDs from 1 to P
+for pid in $(seq 1 $P); do
+    dsub --provider google-cls-v2 --project refined-lotus-456900-t8 --zones "us-east1-*" --logging gs://gene222_hw2_phegde8/logging/F${eid}/stage6/ --input BAM_INPUT=gs://gene222_hw2_phegde8/OUTPUT_BWA/output_dedup_sorted.bam --input-recursive REFERENCE_GR=gs://gene222_datasets_references/REFERENCE_GRCH37 --input-recursive REFERENCE_DB=gs://gene222_datasets_references/REFERENCE_DBSNP --input-recursive REFERENCE_MI=gs://gene222_datasets_references/REFERENCE_MILLS --output OUTPUT_FILE=gs://gene222_hw2_phegde8/OUTPUT_BWA/* --machine-type n1-standard-2 --image broadinstitute/gatk --boot-disk-size 20 --command 'gatk BaseRecalibrator -I "${BAM_INPUT}" -R "${REFERENCE_GR}"/GRCh37-lite.fa --known-sites "${REFERENCE_DB}"/dbSNP.b150.GRCh37p13.All_20170710.vcf.gz --known-sites "${REFERENCE_MI}"/Mills_and_1000G_gold_standard.indels.b37.vcf -O "$(dirname ${OUTPUT_FILE})"/recal_data.table'
+
+#!/bin/bash
+# Define variables
+eid=1  #Experiment ID - running 2 patients – this helps organize the log files  
+projectID="refined-lotus-456900-t8"
+bucketID="gene222_hw2_phegde8"
+# Define the number of patients (P)
+P=1  # Change this to the desired number of patients
+# Loop through patient IDs from 1 to P
+for pid in $(seq 1 $P); do
+    dsub --provider google-cls-v2 --project refined-lotus-456900-t8 --zones "us-east1-*" --logging gs://gene222_hw2_phegde8/logging/F${eid}/stage7/ --input BAM_INPUT=gs://gene222_hw2_phegde8/OUTPUT_BWA/output_dedup_sorted.bam --input RECAL=gs://gene222_hw2_phegde8/OUTPUT_BWA/recal_data.table --input-recursive REFERENCE_GR=gs://gene222_datasets_references/REFERENCE_GRCH37 --output OUTPUT_FILE=gs://gene222_hw2_phegde8/OUTPUT_BWA/* --machine-type n1-standard-2 --image broadinstitute/gatk --boot-disk-size 20 --command 'gatk ApplyBQSR -I "${BAM_INPUT}" -R "${REFERENCE_GR}"/GRCh37-lite.fa --bqsr-recal-file "${RECAL}" -O "$(dirname ${OUTPUT_FILE})"/output_recal_bam.bam' 
+
+#!/bin/bash
+# Define variables
+eid=1  #Experiment ID - running 2 patients – this helps organize the log files  
+projectID="refined-lotus-456900-t8"
+bucketID="gene222_hw2_phegde8"
+# Define the number of patients (P)
+P=1  # Change this to the desired number of patients
+# Loop through patient IDs from 1 to P
+for pid in $(seq 1 $P); do
+    dsub --provider google-cls-v2 --project refined-lotus-456900-t8 --zones "us-east1-*" --logging gs://gene222_hw2_phegde8/logging/F${eid}/stage8/ --input-recursive BAM_INPUT=gs://gene222_hw2_phegde8/OUTPUT_BWA --input-recursive REFERENCE_GR=gs://gene222_datasets_references/REFERENCE_GRCH37 --output OUTPUT_FILE=gs://gene222_hw2_phegde8/OUTPUT_BWA/* --machine-type n1-standard-2 --image broadinstitute/gatk --boot-disk-size 20 --command 'gatk HaplotypeCaller -R "${REFERENCE_GR}"/GRCh37-lite.fa -I "${BAM_INPUT}"/output_recal_bam.bam -O "$(dirname ${OUTPUT_FILE})"/output_vcf.vcf'
+done
