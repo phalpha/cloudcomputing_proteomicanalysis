@@ -1,7 +1,6 @@
-# cloudcomputing_proteomicanalysis
-exploring the use of cloud computing on proteomic data for CS 273C, Cloud Computing for Biology and Healthcare
-
 # Cloud Technologies for Proteomic Analysis of Adipogenesis
+
+exploring the use of cloud computing on proteomic data for CS 273C, Cloud Computing for Biology and Healthcare
 
 ## Project Overview
 
@@ -26,7 +25,7 @@ Abnormal adipogenesis is linked to major metabolic diseases including obesity, c
 3. **Analysis**: Hierarchical clustering and heatmap visualization of protein expression changes
 
 ### Scalability Performance
-- Demonstrated effective **weak scaling** across 1-16 participants
+- Demonstrated effective weak scaling across 1-16 participants
 - Runtime remained nearly constant (~511-557 seconds) as sample size increased
 - **Cost per participant decreased significantly**: from $0.0308 (1 participant) to $0.0328 (16 participants)
 
