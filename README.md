@@ -37,5 +37,5 @@ Abnormal adipogenesis is linked to major metabolic diseases including obesity, c
 
 ## Technical Achievements
 
-Successfully replicated the temporal protein expression heatmap from the original Nature Metabolism paper, validating that cloud-based pipelines can effectively handle sophisticated proteomic analyses while providing superior scalability and cost benefits compared to traditional local computing approaches.
+Successfully replicated the temporal protein expression heatmap from the original Nature Metabolism paper, validating that cloud-based pipelines can effectively handle sophisticated proteomic analyses while providing built-in scalability and cost benefits compared to traditional local computing approaches.
 
