@@ -1,5 +1,5 @@
 # cloudcomputing_proteomicanalysis
-exploring the use of cloud computing on proteomic data
+exploring the use of cloud computing on proteomic data for CS 273C, Cloud Computing for Biology and Healthcare
 
 # Cloud Technologies for Proteomic Analysis of Adipogenesis
 
